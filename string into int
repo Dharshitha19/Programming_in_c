@@ -1,0 +1,35 @@
+#include <limits.h>
+
+int myAtoi(char* s) {
+    int i = 0;
+    int sign = 1;
+    int rev = 0;
+
+    // 1. Skip leading whitespace
+    while (s[i] == ' ') {
+        i++;
+    }
+
+    // 2. Check for sign
+    if (s[i] == '-' || s[i] == '+') {
+        if (s[i] == '-') {
+            sign = -1;
+        }
+        i++;
+    }
+
+    // 3. Convert digits and check for overflow
+    while (s[i] >= '0' && s[i] <= '9') {
+        int pop = s[i] - '0';
+
+        // Check for overflow before updating rev
+        if (rev > INT_MAX / 10 || (rev == INT_MAX / 10 && pop > 7)) {
+            return (sign == 1) ? INT_MAX : INT_MIN;
+        }
+
+        rev = rev * 10 + pop;
+        i++;
+    }
+
+    return rev * sign;
+}
