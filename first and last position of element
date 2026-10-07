@@ -1,0 +1,38 @@
+#include <stdlib.h>
+
+// Helper function to find the bound index
+int findBound(int* nums, int numsSize, int target, int findFirst) {
+    int left = 0;
+    int right = numsSize - 1;
+    int bound = -1;
+    
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        
+        if (nums[mid] == target) {
+            bound = mid;
+            if (findFirst) {
+                right = mid - 1; // Keep scanning left for the starting position
+            } else {
+                left = mid + 1;  // Keep scanning right for the ending position
+            }
+        } else if (nums[mid] > target) {
+            right = mid - 1;
+        } else {
+            left = mid + 1;
+        }
+    }
+    
+    return bound;
+}
+
+int* searchRange(int* nums, int numsSize, int target, int* returnSize) {
+    // LeetCode requires allocating memory dynamically for the returned array
+    int* result = (int*)malloc(2 * sizeof(int));
+    *returnSize = 2;
+    
+    result[0] = findBound(nums, numsSize, target, 1); // Find starting position
+    result[1] = findBound(nums, numsSize, target, 0); // Find ending position
+    
+    return result;
+}
