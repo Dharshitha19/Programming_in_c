@@ -1,0 +1,35 @@
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     struct ListNode *next;
+ * };
+ */
+
+struct ListNode* swapPairs(struct ListNode* head) {
+    // If the list is empty or has only one node, no swaps are needed.
+    if (head == NULL || head->next == NULL) {
+        return head;
+    }
+    
+    // Using a dummy node simplifies managing the head of the list after swapping.
+    struct ListNode dummy;
+    dummy.next = head;
+    struct ListNode* prev = &dummy;
+    
+    while (prev->next && prev->next->next) {
+        // Identify the two nodes to be swapped
+        struct ListNode* first = prev->next;
+        struct ListNode* second = first->next;
+        
+        // Adjust the pointers to perform the swap
+        first->next = second->next;
+        second->next = first;
+        prev->next = second;
+        
+        // Move prev forward by two nodes for the next pair iteration
+        prev = first;
+    }
+    
+    return dummy.next;
+}
