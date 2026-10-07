@@ -1,0 +1,21 @@
+int removeDuplicates(int* nums, int numsSize) {
+    // If the array is empty, there are 0 unique elements
+    if (numsSize == 0) {
+        return 0;
+    }
+    
+    // The first element is always unique, so start writing at index 1
+    int writePointer = 1;
+    
+    // Scan the array starting from the second element
+    for (int readPointer = 1; readPointer < numsSize; readPointer++) {
+        // If we find a value different from the previous unique element
+        if (nums[readPointer] != nums[writePointer - 1]) {
+            nums[writePointer] = nums[readPointer];
+            writePointer++;
+        }
+    }
+    
+    // The write pointer matches the count of unique elements (k)
+    return writePointer;
+}
