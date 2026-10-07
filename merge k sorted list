@@ -1,0 +1,52 @@
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     struct ListNode *next;
+ * };
+ */
+
+// Helper function to merge two sorted linked lists
+struct ListNode* mergeTwoLists(struct ListNode* l1, struct ListNode* l2) {
+    struct ListNode dummy;
+    struct ListNode* tail = &dummy;
+    dummy.next = NULL;
+    
+    while (l1 && l2) {
+        if (l1->val < l2->val) {
+            tail->next = l1;
+            l1 = l1->next;
+        } else {
+            tail->next = l2;
+            l2 = l2->next;
+        }
+        tail = tail->next;
+    }
+    
+    tail->next = l1 ? l1 : l2;
+    return dummy.next;
+}
+
+// Main function to merge k sorted lists
+struct ListNode* mergeKLists(struct ListNode** lists, int listsSize) {
+    if (listsSize == 0 || lists == NULL) {
+        return NULL;
+    }
+    
+    // Divide and conquer loop to pair and merge the lists in-place
+    while (listsSize > 1) {
+        int nextSize = 0;
+        
+        for (int i = 0; i < listsSize; i += 2) {
+            struct ListNode* l1 = lists[i];
+            struct ListNode* l2 = (i + 1 < listsSize) ? lists[i + 1] : NULL;
+            
+            // Overwrite the original lists array positions to save space
+            lists[nextSize++] = mergeTwoLists(l1, l2);
+        }
+        
+        listsSize = nextSize;
+    }
+    
+    return lists[0];
+}
