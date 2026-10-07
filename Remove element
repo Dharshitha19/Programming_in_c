@@ -1,0 +1,16 @@
+int removeElement(int* nums, int numsSize, int val) {
+    // Pointer to keep track of the index for elements not equal to val
+    int k = 0;
+    
+    // Iterate through the entire array
+    for (int i = 0; i < numsSize; i++) {
+        // If the current element is not the target value
+        if (nums[i] != val) {
+            nums[k] = nums[i];
+            k++;
+        }
+    }
+    
+    // k represents the total count of elements remaining after removal
+    return k;
+}
