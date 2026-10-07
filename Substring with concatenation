@@ -1,0 +1,98 @@
+#include <stdlib.h>
+#include <string.h>
+
+#define HASH_SIZE 10007
+
+typedef struct {
+    char* word;
+    int count;
+} HashNode;
+
+unsigned long getHash(const char* str) {
+    unsigned long hash = 5381;
+    int c;
+    while ((c = *str++)) {
+        hash = ((hash << 5) + hash) + c;
+    }
+    return hash % HASH_SIZE;
+}
+
+int* findSubstring(char* s, char** words, int wordsSize, int* returnSize) {
+    *returnSize = 0;
+    if (!s || wordsSize == 0) return NULL;
+
+    int sLen = strlen(s);
+    int wordLen = strlen(words[0]);
+    int totalLen = wordLen * wordsSize;
+
+    if (sLen < totalLen) return NULL;
+
+    int* result = (int*)malloc(sizeof(int) * sLen);
+    HashNode* targetMap = (HashNode*)calloc(HASH_SIZE, sizeof(HashNode));
+    
+    for (int i = 0; i < wordsSize; i++) {
+        unsigned long idx = getHash(words[i]);
+        while (targetMap[idx].word != NULL && strcmp(targetMap[idx].word, words[i]) != 0) {
+            idx = (idx + 1) % HASH_SIZE;
+        }
+        if (targetMap[idx].word == NULL) {
+            targetMap[idx].word = words[i];
+        }
+        targetMap[idx].count++;
+    }
+
+    int* currentCounts = (int*)calloc(HASH_SIZE, sizeof(int));
+    char* tempWord = (char*)malloc(sizeof(char) * (wordLen + 1));
+    tempWord[wordLen] = '\0';
+
+    for (int i = 0; i < wordLen; i++) {
+        memset(currentCounts, 0, sizeof(int) * HASH_SIZE);
+        int left = i;
+        int count = 0;
+
+        for (int right = i; right + wordLen <= sLen; right += wordLen) {
+            memcpy(tempWord, s + right, wordLen);
+            
+            unsigned long idx = getHash(tempWord);
+            while (targetMap[idx].word != NULL && strcmp(targetMap[idx].word, tempWord) != 0) {
+                idx = (idx + 1) % HASH_SIZE;
+            }
+
+            if (targetMap[idx].word == NULL) {
+                memset(currentCounts, 0, sizeof(int) * HASH_SIZE);
+                count = 0;
+                left = right + wordLen;
+                continue;
+            }
+
+            currentCounts[idx]++;
+            count++;
+
+            while (currentCounts[idx] > targetMap[idx].count) {
+                char* leftWord = (char*)malloc(sizeof(char) * (wordLen + 1));
+                memcpy(leftWord, s + left, wordLen);
+                leftWord[wordLen] = '\0';
+                
+                unsigned long leftIdx = getHash(leftWord);
+                while (targetMap[leftIdx].word != NULL && strcmp(targetMap[leftIdx].word, leftWord) != 0) {
+                    leftIdx = (leftIdx + 1) % HASH_SIZE;
+                }
+                
+                currentCounts[leftIdx]--;
+                count--;
+                left += wordLen;
+                free(leftWord);
+            }
+
+            if (count == wordsSize) {
+                result[(*returnSize)++] = left;
+            }
+        }
+    }
+
+    free(targetMap);
+    free(currentCounts);
+    free(tempWord);
+
+    return result;
+}
