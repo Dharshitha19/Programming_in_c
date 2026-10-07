@@ -1,0 +1,49 @@
+int longestValidParentheses(char* s) {
+    int maxLen = 0;
+    int open = 0, close = 0;
+    
+    // 1. Left-to-right pass
+    for (int i = 0; s[i] != '\0'; i++) {
+        if (s[i] == '(') {
+            open++;
+        } else {
+            close++;
+        }
+        
+        if (open == close) {
+            int currentLen = 2 * close;
+            if (currentLen > maxLen) maxLen = currentLen;
+        } else if (close > open) {
+            open = 0;
+            close = 0;
+        }
+    }
+    
+    open = 0;
+    close = 0;
+    
+    // Calculate string length
+    int len = 0;
+    while (s[len] != '\0') {
+        len++;
+    }
+    
+    // 2. Right-to-left pass
+    for (int i = len - 1; i >= 0; i--) {
+        if (s[i] == '(') {
+            open++;
+        } else {
+            close++;
+        }
+        
+        if (open == close) {
+            int currentLen = 2 * open;
+            if (currentLen > maxLen) maxLen = currentLen;
+        } else if (open > close) {
+            open = 0;
+            close = 0;
+        }
+    }
+    
+    return maxLen;
+}
