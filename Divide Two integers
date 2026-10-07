@@ -1,0 +1,27 @@
+int divide(int dividend, int divisor) {
+    // 1. Handle the extreme overflow edge case (-2^31 / -1)
+    if (dividend == -2147483648 && divisor == -1) {
+        return 2147483647;
+    }
+    
+    // 2. Determine the sign of the result
+    int isNegative = (dividend < 0) ^ (divisor < 0);
+    
+    // 3. Cast to unsigned long long to safely convert negative bounds to positive numbers
+    unsigned long long absDividend = (dividend == -2147483648) ? 2147483648ULL : (unsigned long long)(dividend < 0 ? -dividend : dividend);
+    unsigned long long absDivisor = (divisor == -2147483648) ? 2147483648ULL : (unsigned long long)(divisor < 0 ? -divisor : divisor);
+    
+    unsigned int quotient = 0;
+    
+    // 4. Scan down from bit 31 to 0 using a safe right-shift
+    for (int i = 31; i >= 0; i--) {
+        // Equivalent to checking if (absDivisor * 2^i) <= absDividend
+        if ((absDividend >> i) >= absDivisor) {
+            quotient += (1U << i);
+            absDividend -= (absDivisor << i);
+        }
+    }
+    
+    // 5. Apply the sign constraint
+    return isNegative ? -(int)quotient : (int)quotient;
+}
